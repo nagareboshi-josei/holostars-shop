@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Holostars Shop</title>
+<style>
+body {
+  font-family: 'Arial', sans-serif;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 0;
+}
+
+/* Header */
+h1 {
+  text-align: center;
+  color: #333;
+  margin: 20px 0 10px 0;
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+  margin: 20px 0 10px 0;
+}
+  
+/* Celebrity Nav Bar */
+.navbar {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  background: #e29fee;
+  padding: 10px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.navbar a:hover {
+  background: #0056b3;
+}
+
+/* Layout */
+.container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* Product Area */
+.products-container {
+  flex: 1;
+}
+
+/* Celebrity row */
+.celebrity-row {
+  margin-bottom: 40px;
+}
+
+.celebrity-row h2 {
+  margin-bottom: 10px;
+  color: #222;
+  scroll-margin-top: 120px;
+}
+
+/* Product cards */
+.products-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.product-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  overflow: hidden;
+  text-align: center;
+  padding: 10px;
+  width: 200px;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+}
+
+.product-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.3s;
+}
+
+.product-card img:hover {
+  transform: scale(1.1); /* Zoom on hover */
+}
+
+.product-card h4 {
+  margin: 10px 0 5px 0;
+  font-size: 1.1em;
+  color: #222;
+}
+
+.product-card p {
+  margin: 5px 0;
+  color: #555;
+}
+
+input[type="number"] {
+  width: 60px;
+  padding: 5px;
+  margin-top: 5px;
+}
+
+/* Basket / Cart */
+.cart {
+  width: 300px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 15px;
+  height: fit-content;
+  position: sticky;
+  top: 50px;
+}
+
+.cart h3 {
+  margin-top: 0;
+  text-align: center;
+  color: #333;
+}
+
+.cart-items {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
+.cart-items div {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.cart-total {
+  font-weight: bold;
+  text-align: right;
+  margin-top: 10px;
+}
+
+button.checkout-btn {
+  width: 100%;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  font-size: 1em;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button.checkout-btn:hover {
+  background: #0056b3;
+}
+
+input#customer-name {
+  width: 100%;
+  padding: 6px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* Full-size popup */
+#image-popup {
+  position: fixed;
+  display: none;
+  top:50%;
+  left:50%;
+  transform: translate(-50%,-50%);
+  max-width: 90%;
+  max-height: 90%;
+  background: #fff;
+  border-radius: 10px;
+  z-index: 1000;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  padding: 10px;
+  text-align: center;
+}
+
+#image-popup img {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 8px;
+}
+
+#image-popup button.close-btn {
+  margin-top: 10px;
+  padding: 6px 12px;
+  border: none;
+  background: #007bff;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#image-popup button.close-btn:hover {
+  background: #0056b3;
+}
+</style>
+</head>
+<body>
+
+<h1>Holostars Shop</h1>
+
+<div class="navbar" id="celebrity-nav"></div>
+
+<h2>Click for full size image</h2>
+  
+<div class="container">
+  <div class="products-container" id="products"></div>
+
+  <div class="cart">
+    <h3>Shopping Basket</h3>
+    <div class="cart-items" id="cart-items"><i>Basket is empty</i></div>
+    <div class="cart-total" id="cart-total">Total: £0.00</div>
+    <input type="text" id="customer-name" placeholder="Your Name" />
+    <button class="checkout-btn" onclick="checkout()">Place Order</button>
+  </div>
+</div>
+
+<!-- Full-size image popup -->
+<div id="image-popup">
+  <img src="" alt="Product">
+  <br>
+  <button class="close-btn" onclick="closePopup()">Close</button>
+</div>
+
+<script>
+const SHEET_API = "https://script.google.com/macros/s/AKfycbxKS_dC7R3b7B29lWhDH7LMqMR6vxzYUP48LoAUumjPkRVsZPt-QF3YwineEuFuctH2lA/exec";
+let products = [];
+let cart = [];
+
+// Load products
+async function loadProducts() {
+  const res = await fetch(SHEET_API);
+  products = await res.json();
+  const container = document.getElementById("products");
+  container.innerHTML = "";
+  const nav = document.getElementById("celebrity-nav");
+  nav.innerHTML = "";
+
+  // Group by celebrity
+  const grouped = {};
+  products.forEach(p => {
+    if(!grouped[p.Celebrity]) grouped[p.Celebrity]=[];
+    grouped[p.Celebrity].push(p);
+  });
+
+  // Celebrity nav
+  Object.keys(grouped).forEach(celeb=>{
+    const a=document.createElement("a");
+    a.href=`#celebrity-${celeb}`;
+    a.innerText=celeb;
+    nav.appendChild(a);
+  });
+
+  for(const celeb in grouped){
+    const celebRow=document.createElement("div");
+    celebRow.className="celebrity-row";
+    celebRow.id=`celebrity-${celeb}`;
+    celebRow.innerHTML=`<h2>${celeb}</h2>`;
+    const grid=document.createElement("div");
+    grid.className="products-grid";
+
+    grouped[celeb].forEach(p=>{
+      const card=document.createElement("div");
+      card.className="product-card";
+
+      const stock=parseInt(p.Stock);
+      const price=parseFloat(p["Price (GBP)"]);
+
+      card.innerHTML=`
+        <img src="${p["Image URL"]}" alt="${p["Item Name"]}">
+        <h4>${p["Item Name"]}</h4>
+        <p id="stock-${p.Celebrity}-${p["Item Name"]}">£${price.toFixed(2)} | Stock: ${stock}</p>
+        <input type="number" min="0" max="${stock}" value="0" id="qty-${p.Celebrity}-${p["Item Name"]}">
+      `;
+
+      const img = card.querySelector("img");
+      // Full-size image on click
+      img.addEventListener("click", ()=>showPopup(p["Image URL"]));
+
+      const qtyInput = card.querySelector("input");
+      qtyInput.addEventListener("input", ()=>{
+        let quantity=parseInt(qtyInput.value)||0;
+        if(quantity>stock){quantity=stock; qtyInput.value=stock;}
+
+        const existing=cart.find(i=>i.celebrity===p.Celebrity && i.name===p["Item Name"]);
+        if(quantity===0 && existing) cart=cart.filter(i=>!(i.celebrity===p.Celebrity && i.name===p["Item Name"]));
+        else if(existing) existing.quantity=quantity;
+        else if(quantity>0) cart.push({celebrity:p.Celebrity, name:p["Item Name"], price, quantity});
+
+        renderCart();
+        updateStockDisplay();
+      });
+
+      grid.appendChild(card);
+    });
+
+    celebRow.appendChild(grid);
+    container.appendChild(celebRow);
+  }
+}
+
+// Full-size popup functions
+function showPopup(src){
+  const popup = document.getElementById("image-popup");
+  popup.querySelector("img").src = src;
+  popup.style.display = "block";
+}
+function closePopup(){
+  document.getElementById("image-popup").style.display = "none";
+}
+
+// Update stock display
+function updateStockDisplay(){
+  products.forEach(p=>{
+    const celeb=p.Celebrity;
+    const name=p["Item Name"];
+    const originalStock=parseInt(p.Stock);
+    const inCart=cart.find(i=>i.celebrity===celeb && i.name===name);
+    const remainingStock=originalStock-(inCart?inCart.quantity:0);
+    const stockElem=document.getElementById(`stock-${celeb}-${name}`);
+    if(stockElem) stockElem.innerText=`£${parseFloat(p["Price (GBP)"]).toFixed(2)} | Stock: ${remainingStock}`;
+  });
+}
+
+// Render cart
+function renderCart(){
+  const container=document.getElementById("cart-items");
+  container.innerHTML="";
+  let total=0;
+  if(cart.length===0) container.innerHTML="<i>Basket is empty</i>";
+  cart.forEach(i=>{
+    const lineTotal=i.price*i.quantity;
+    total+=lineTotal;
+    container.innerHTML+=`<div>${i.name} (${i.celebrity}) x ${i.quantity} (£${lineTotal.toFixed(2)})</div>`;
+  });
+  document.getElementById("cart-total").innerText=`Total: £${total.toFixed(2)}`;
+}
+
+// Checkout
+async function checkout() {
+  const customerName = document.getElementById("customer-name").value.trim();
+  if(!customerName){ alert("Enter your name"); return; }
+  if(cart.length===0){ alert("Basket is empty"); return; }
+
+  // Instant confirmation
+  alert("✅ Order received! Thank you, " + customerName + "!");
+
+  // Save current cart for sending to server
+  const orderToSend = [...cart];
+
+  // Reset cart immediately
+  cart = [];
+  renderCart();
+  document.getElementById("customer-name").value = "";
+
+  // Send order in the background
+  try {
+    const res = await fetch(SHEET_API, {
+      method: "POST",
+      body: JSON.stringify({customerName, items: orderToSend}),
+    });
+    const data = await res.json();
+    if(data.status==="success"){
+      // Refresh products to update stock counts
+      await loadProducts();
+    } else {
+      alert("⚠️ Error saving order to server. Stock may not be updated.");
+    }
+  } catch(err) {
+    console.error("Error sending order:", err);
+    alert("⚠️ Network error. Stock may not be updated.");
+  }
+}
+
+loadProducts();
+</script>
+
+</body>
+</html>
