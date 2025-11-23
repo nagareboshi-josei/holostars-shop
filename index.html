@@ -222,6 +222,47 @@ input#customer-name {
 #image-popup button.close-btn:hover {
   background: #0056b3;
 }
+
+/* About Panel */
+.about-panel {
+  margin-top: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+
+.about-header {
+  background: #e29fee;
+  color: #fff;
+  padding: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 12px 12px 0 0;
+  transition: background 0.2s;
+}
+
+.about-header:hover {
+  background: #d06bdb;
+}
+
+.about-content {
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 15px;
+  background: #fff;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+  line-height: 1.5em;
+  color: #444;
+}
+
+.about-content.open {
+  padding: 15px;
+  max-height: 1000px; /* large value to allow full expansion */
+}
+
+  
 </style>
 </head>
 <body>
@@ -241,6 +282,39 @@ input#customer-name {
     <div class="cart-total" id="cart-total">Total: £0.00</div>
     <input type="text" id="customer-name" placeholder="Your Name" />
     <button class="checkout-btn" onclick="checkout()">Place Order</button>
+
+    <div class="about-panel">
+      <div class="about-header" onclick="toggleAbout()">About This Shop ⯆</div>
+      <div class="about-content" id="about-content">
+        <p><strong>Location:</strong><br>
+        Shipping from England/UK but (1) Full Miyabi birthday set (NEW & SEALED) ships from USA.</p>
+    
+        <p><strong>Payment info:</strong><br>
+        I accept PayPal.<br><br>
+        Please DM on Discord or email to buy for total with shipping and PayPal address.<br>
+        <strong>Email for questions about orders:</strong> <br>
+        <a href="mailto:nagareboshi.josei@gmail.com">nagareboshi.josei@gmail.com</a></p>
+    
+        <p><strong>Shipping info:</strong><br>
+        I strongly prefer to ship with tracking to protect us both so we can be sure all merch arrives safely!<br><br>
+        If you really do not want to pay for tracking, and the package is lost, there is nothing I can do to help :( <br><br>
+    
+        If shipping outside the UK:<br><br> 
+        I can mark down a package's worth if asked, BUT be aware the post will only refund the amount you declare.<br><br> 
+        Please be clear how you want me to mark your customs form: gift, goods, etc.<br><br> 
+        You are responsible for customs/VAT/any extra fees.<br><br>
+    
+        Shipping is extra and calculated by weight & size.</p>
+    
+        <p><strong>Extra notes:</strong><br>
+        I still have more to add, so if you’re looking for more items from your oshis, feel free to ask :3</p>
+        
+        <p><strong>Prices:</strong><br>
+        All prices in GBP £ (Great British Pounds).</p>
+      </div>
+    </div>
+
+    
   </div>
 </div>
 
@@ -365,6 +439,11 @@ function renderCart(){
   document.getElementById("cart-total").innerText=`Total: £${total.toFixed(2)}`;
 }
 
+function toggleAbout() {
+  const content = document.getElementById("about-content");
+  content.classList.toggle("open");
+}
+  
 // Checkout
 async function checkout() {
   const customerName = document.getElementById("customer-name").value.trim();
