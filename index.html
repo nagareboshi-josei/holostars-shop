@@ -297,6 +297,18 @@ input#customer-name {
     <div class="cart-items" id="cart-items"><i>Basket is empty</i></div>
     <div class="cart-total" id="cart-total">Total: £0.00</div>
     <input type="text" id="customer-name" placeholder="Your Name" />
+    <input
+      type="email"
+      id="customer-email"
+      placeholder="Your Email Address"
+      style="
+        width:100%;
+        padding:6px;
+        margin-bottom:10px;
+        border-radius:6px;
+        border:1px solid #ccc;
+      "
+    />
     <button class="checkout-btn" onclick="checkout()">Place Order</button>
 
     <div class="about-panel">
@@ -498,9 +510,29 @@ function switchAboutTab(tabName) {
 // Checkout
 async function checkout() {
   const customerName = document.getElementById("customer-name").value.trim();
-  if(!customerName){ alert("Enter your name"); return; }
-  if(cart.length===0){ alert("Basket is empty"); return; }
-
+  //if(!customerName){ alert("Enter your name"); return; }
+  //if(cart.length===0){ alert("Basket is empty"); return; }
+  const customerEmail = document.getElementById("customer-email").value.trim();
+  
+  if(!customerName){
+    alert("Please enter your name.");
+    return;
+  }
+  
+  if(!customerEmail){
+    alert("Please enter your email address.");
+    return;
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!emailRegex.test(customerEmail)){
+    alert("Please enter a valid email address.");
+    return;
+  }
+  if(cart.length===0){
+    alert("Basket is empty");
+    return;
+  }
+  
   // Instant confirmation
   alert("✅ Order received! Thank you, " + customerName + "!");
 
@@ -511,12 +543,13 @@ async function checkout() {
   cart = [];
   renderCart();
   document.getElementById("customer-name").value = "";
+  document.getElementById("customer-email").value = "";
 
   // Send order in the background
   try {
     const res = await fetch(SHEET_API, {
       method: "POST",
-      body: JSON.stringify({customerName, items: orderToSend}),
+      body: JSON.stringify({customerName, customerEmail, items: orderToSend}),
     });
     const data = await res.json();
     if(data.status==="success"){
